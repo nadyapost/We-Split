@@ -43,10 +43,11 @@ struct ContentView: View {
         NavigationView {
             Form {
                 Section {
-                    TextField("Bill amount", text: $billAmount)
+                    TextField("Bill Amount", text: $billAmount)
                         .keyboardType(.decimalPad)
                     TextField("Number of people", text: $numberOfPeople)
                         .keyboardType(.numberPad)
+                        
 //                    Picker("Number of people", selection: $numberOfPeople) {
 //                        ForEach(2 ..< 4) {
 //                            Text("\($0) people")
@@ -71,15 +72,32 @@ struct ContentView: View {
                 
             }
             .navigationBarTitle("We Split")
+            .modifier(DismissingKeyboard())
         }
-        
-        
     }
+
 }
+
 
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+
+struct DismissingKeyboard: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .onTapGesture {
+                let keyWindow = UIApplication.shared.connectedScenes
+                        .filter({$0.activationState == .foregroundActive})
+                        .map({$0 as? UIWindowScene})
+                        .compactMap({$0})
+                        .first?.windows
+                        .filter({$0.isKeyWindow}).first
+                keyWindow?.endEditing(true)
+        }
     }
 }
